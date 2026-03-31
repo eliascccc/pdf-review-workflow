@@ -2,7 +2,7 @@
 
 > ⚠️ This is NOT a PDF parser.
 >
-> This project is a **framework for working with PDF parsing in a business setting**.
+> This project is a **framework for working with PDF parsing in an operations-perspective**.
 
 ---
 
