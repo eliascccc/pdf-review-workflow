@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF-M - Processing</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            line-height: 1.5;
+        }
+
+        .status-box {
+            padding: 16px;
+            border: 1px solid #ccc;
+            background: #f8f8f8;
+            margin-bottom: 20px;
+        }
+
+        .status-ok {
+            border-color: #2e7d32;
+            background: #eef8ef;
+        }
+
+        .status-failed {
+            border-color: #c62828;
+            background: #fdeeee;
+        }
+
+        .downloads {
+            display: none;
+            margin-top: 20px;
+            padding: 16px;
+            border: 1px solid #ccc;
+            background: #fafafa;
+        }
+
+        .muted {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Processing started</h1>
+
+    <div id="statusBox" class="status-box">
+        <p><strong>Job ID:</strong> <span id="job_id">{{ job_id }}</span></p>
+        <p><strong>Status:</strong> <span id="status">queued</span></p>
+        <p><strong>Result:</strong> <span id="result">Waiting for worker...</span></p>
+    </div>
+
+    <p class="muted" id="infoText">
+        This page updates automatically while your files are being processed.
+    </p>
+
+    <div id="downloads" class="downloads">
+        <h2>Downloads</h2>
+        <p>Your files are ready.</p>
+        <p><a href="/get-pdf/summary.pdf" target="_blank">Open summary PDF</a></p>
+        <p><a href="/get-image/output.xlsx" target="_blank">Open output Excel</a></p>
+    </div>
+
+    <script>
+        function setProcessingState(state, result) {
+            $('#status').text(state || 'unknown');
+
+            if (state === 'queued') {
+                $('#result').text('Waiting in queue...');
+            } else if (state === 'processing') {
+                $('#result').text('Processing files...');
+            } else if (state === 'wait...') {
+                $('#result').text('Worker picked up the job...');
+            } else {
+                $('#result').text(result ?? '');
+            }
+        }
+
+        function setDoneState(result) {
+            $('#status').text('done');
+            $('#result').text('Completed. Processed PDF count: ' + result);
+            $('#statusBox').addClass('status-ok');
+            $('#infoText').text('Processing finished successfully.');
+            $('#downloads').show();
+        }
+
+        function setFailedState(result) {
+            $('#status').text('failed');
+            $('#result').text('Processing failed' + (result !== undefined ? ' (code: ' + result + ')' : ''));
+            $('#statusBox').addClass('status-failed');
+            $('#infoText').text('Something went wrong during processing.');
+            $('#downloads').hide();
+        }
+
+        function doPoll() {
+            $.post('/query', { id: {{ job_id | tojson }} })
+                .done(function (data) {
+                    if (data.error) {
+                        $('#status').text('error');
+                        $('#result').text(data.error);
+                        $('#statusBox').addClass('status-failed');
+                        $('#infoText').text('The server returned an error.');
+                        return;
+                    }
+
+                    const state = data.state;
+                    const result = data.result;
+
+                    if (state === 'done') {
+                        setDoneState(result);
+                        return;
+                    }
+
+                    if (state === 'failed') {
+                        setFailedState(result);
+                        return;
+                    }
+
+                    setProcessingState(state, result);
+                    setTimeout(doPoll, 3000);
+                })
+                .fail(function () {
+                    $('#status').text('connection error');
+                    $('#result').text('Could not reach server. Retrying...');
+                    $('#statusBox').addClass('status-failed');
+                    $('#infoText').text('Temporary connection issue. The page will try again automatically.');
+                    setTimeout(doPoll, 5000);
+                });
+        }
+
+        $(document).ready(function () {
+            doPoll();
+        });
+    </script>
+</body>
+</html>

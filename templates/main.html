@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF-M</title>
+
+    {{ dropzone.load_css() }}
+    {{ dropzone.style('border: 2px dashed #0087F7; margin: 20px 0; min-height: 250px; padding: 20px;') }}
+    <style>
+    body {
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        background: #f7f8fa;
+        color: #1f2933;
+        margin: 40px auto;
+        max-width: 720px;
+        padding: 0 20px;
+    }
+
+    h1 {
+        font-size: 24px;
+        font-weight: 500;
+    }
+
+    form.dropzone {
+        border: 1.5px dashed #cfd6df !important;
+        border-radius: 10px !important;
+        background: #ffffff !important;
+        padding: 24px !important;
+        transition: border-color 0.2s ease;
+    }
+
+    form.dropzone:hover {
+        border-color: #6b7280 !important;
+    }
+
+    .dz-message {
+        font-size: 14px;
+        color: #6b7280;
+    }
+
+    button {
+        margin-top: 16px;
+        padding: 10px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        border: none;
+        border-radius: 8px;
+        background: #1f2933;
+        color: white;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #111827;
+    }
+</style>
+</head>
+<body>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <h1>Upload PDF or email files to start processing.</h1>
+    
+
+    {{ dropzone.create('/') }}
+
+    <button id="start-upload" type="button">Start processing</button>
+
+    {{ dropzone.load_js() }}
+    {{ dropzone.config() }}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const dz = Dropzone.forElement("form.dropzone");
+            const startButton = document.getElementById("start-upload");
+
+            dz.options.uploadMultiple = true;
+            dz.options.parallelUploads = 100;
+            dz.options.autoProcessQueue = false;
+
+            startButton.addEventListener("click", function () {
+                if (dz.getQueuedFiles().length === 0) {
+                    alert("Add at least one file first.");
+                    return;
+                }
+                dz.processQueue();
+            });
+
+            dz.on("successmultiple", function (files, response) {
+                if (response.job_id) {
+                    window.location.href = "/completed/" + response.job_id;
+                } else {
+                    alert("Upload succeeded, but no job_id was returned.");
+                }
+            });
+
+            dz.on("errormultiple", function (files, response) {
+                console.error(response);
+                alert("Upload failed.");
+            });
+
+            dz.on("success", function (file, response) {
+                if (response.job_id) {
+                    window.location.href = "/completed/" + response.job_id;
+                }
+            });
+
+            dz.on("error", function (file, response) {
+                console.error(response);
+            });
+        });
+    </script>
+</body>
+</html>
