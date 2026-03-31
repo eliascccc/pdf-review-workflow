@@ -1,8 +1,9 @@
-# PDF → Excel Workflow (Email-driven, multi-supplier)
+# pdf-review-workflow
+"you can batch messy real-world PDFs and still trust the output because of review"
 
 > ⚠️ This is NOT a PDF parser.
 >
-> This project is a **framework for working with PDF parsing in an operations-perspective**.
+> This project is a **framework for working with PDF parsing in an operations perspective**.
 
 ---
 
@@ -111,8 +112,11 @@ This is critical because:
 ---
 <img width="961" height="451" alt="image" src="https://github.com/user-attachments/assets/c0528d4c-7f42-4b8e-b444-0ac35f8158e1" />
 
-The picture shows an example of the review step. The data extracted has yellow background, and the red box includes the source.
-"Excelrow" corresponds to the row in the output excel file.
+Example of the review step:
+
+- Yellow fields = extracted data  
+- Red boxes = source locations in the PDF  
+- "Excelrow" corresponds to the row in the output Excel file  
 
 ---
 
