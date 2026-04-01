@@ -171,6 +171,7 @@ you verify it.
 - Parsing is fully custom per supplier
 - No guarantee of correctness without review
 - Not designed for cloud or scaling (local use)
+- Not multi-user safe (not yet, in progress)
 
 ---
 
