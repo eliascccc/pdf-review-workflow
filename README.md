@@ -1,25 +1,27 @@
 # pdf-review-engine
 
-"you can batch messy real-world PDFs and still trust the output because of review"
+Batch messy real-world PDFs — and still trust the output.
+
+A review-first engine for PDF parsing.
 
 ---
 > ⚠️ This is NOT a PDF parser.
 >
-> This project is a **framework for working with PDF parsing in an operations perspective**.
+> This project **makes PDF parsing usable** in real operations.
 
 ---
 
 https://github.com/user-attachments/assets/d0085fcf-6ed8-49a4-9688-df7066e84a11
 
-## What this is
+## Typical flow (video demo)
 
-This project provides a simple way to:
+1. Drag emails directly from Outlook into the web UI  
+2. System extracts PDF attachments  
+3. Each PDF is parsed using a supplier-specific parser  
+4. A review PDF is generated (with overlays)  
+5. Operator verifies extracted data  
+6. Data is used in Excel  
 
-- take PDFs directly from email (including Outlook drag & drop)
-- process multiple files at once
-- handle multiple suppliers in the same batch
-- generate a **review PDF with overlays** for validation
-- convert everything into a single Excel file
 
 It is designed to run as a **local tool inside a company**, not as a SaaS or generic converter.
 
@@ -32,7 +34,7 @@ This project does **NOT solve PDF parsing**.
 PDF parsing is:
 - supplier-specific
 - format-dependent
-- inherently unreliable
+- unreliable
 
 👉 You are expected to:
 - test different parsing approaches
@@ -51,17 +53,6 @@ This tool is useful when:
 - you do NOT have EDI
 - you get documents in batches ("in bursts")
 - you want to quickly move data into Excel for further processing
-
----
-
-## Typical flow
-
-1. Drag emails directly from Outlook into the web UI  
-2. System extracts PDF attachments  
-3. Each PDF is parsed using a supplier-specific parser  
-4. A review PDF is generated (with overlays)  
-5. Operator verifies extracted data  
-6. Data is used in Excel  
 
 ---
 
@@ -86,39 +77,35 @@ This project handles:
 - job queue + worker system  
 
 ---
-
-## Why this approach works
-
-Instead of trying to build a “perfect parser”, this system:
-
-- accepts that parsing will fail sometimes
-- makes errors visible via review PDFs
-- lets operators verify results quickly
-- allows mixing multiple suppliers in one run
-
----
-
-
-## Review step (important)
-
-Every processed PDF is included in a **review document**:
-
-- overlays show extracted values directly on the original PDF
-- errors and unknown suppliers are clearly marked
-- nothing is silently dropped
-
-This is critical because:
-
-> PDF parsing is not deterministic — verification is required.
-
----
 <img width="961" height="451" alt="image" src="https://github.com/user-attachments/assets/c0528d4c-7f42-4b8e-b444-0ac35f8158e1" />
 
 Example of the review step:
 
 - Yellow fields = extracted data  
 - Red boxes = source locations in the PDF  
-- "Excelrow" corresponds to the row in the output Excel file  
+- "Excelrow" links each extracted value to its row in the output Excel file
+
+---
+
+## The (very important) review step
+
+This system is built around one assumption:
+
+> parsing will fail.
+
+Every processed PDF is turned into a **review document**:
+
+- extracted values are overlaid on the original PDF
+- errors are visible immediately
+- nothing is silently dropped
+
+This enables:
+
+- fast human verification
+- safe batch processing across suppliers
+
+Instead of chasing perfect parsing,
+this system makes imperfect parsing usable.
 
 ---
 
@@ -156,6 +143,15 @@ python worker.py
 
 ---
 
+## Compatibility
+
+Tested with:
+- Chrome, Edge, Firefox  
+- Windows and Linux  
+- Outlook drag & drop (.msg files)
+
+---
+
 ## Limitations
 
 - Only single-page PDFs are supported (by design)
@@ -165,9 +161,7 @@ python worker.py
 
 ---
 
-## Final note
+## Philosophy
 
-This project is about:
-
-making PDF parsing _usable_, not perfect, in practice.
+Make PDF parsing usable — not perfect.
 
