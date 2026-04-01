@@ -150,6 +150,21 @@ Tested with:
 
 ---
 
+## Positioning
+
+Most PDF tools focus on extracting data.
+
+This project is built around reviewing that data.
+
+Every result is turned into a visual review document,
+where extracted values are overlaid on the original PDF
+and explicitly linked to the output.
+
+Instead of trusting parsing,
+you verify it.
+
+---
+
 ## Limitations
 
 - Only single-page PDFs are supported (by design)
